@@ -1,20 +1,16 @@
-import openai
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
-openai.api_key = "your-openai-api-key"  # Replace with your OpenAI API key
+app = FastAPI()
 
+
+# Define the model for the restaurant query
+class RestaurantQuery(BaseModel):
+    query: str
+
+# Create an endpoint to suggest restaurants
 @app.post("/suggest_restaurant")
 async def suggest_restaurant(query: RestaurantQuery):
-    try:
-        # Call OpenAI API for suggestions
-        response = openai.Completion.create(
-            model="text-davinci-003",
-            prompt=f"Suggest restaurants based on this preference: {query.query}",
-            max_tokens=100,
-            temperature=0.7
-        )
-        
-        suggestion = response.choices[0].text.strip()
-        return {"query": query.query, "suggestions": suggestion}
-    
-    except Exception as e:
-        return {"error": str(e)}
+    sample_suggestions = ["Sushi Place", "Pizza Corner", "Taco Town"]
+    return {"query": query.query, "suggestions": sample_suggestions}
