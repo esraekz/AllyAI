@@ -15,7 +15,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # You can restrict this to specific domains in production
+    allow_origins=["*"],  # For development; replace with specific origins in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -25,25 +25,25 @@ app.add_middleware(
 class RestaurantQuery(BaseModel):
     query: str
 
-# Create an endpoint to suggest restaurants using OpenAI
+# Create an endpoint to suggest restaurants using OpenAI's new API
 @app.post("/suggest_restaurant")
 async def suggest_restaurant(query: RestaurantQuery):
     try:
-        # Call OpenAI API to get restaurant suggestions
-        response = openai.Completion.create(
-            engine="text-davinci-003",
-            prompt=f"Suggest some restaurants based on the query: {query.query}",
+        # Call OpenAI API to get restaurant suggestions using the updated ChatCompletion endpoint
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",  # or gpt-4 if available
+            messages=[{"role": "user", "content": f"Suggest some restaurants based on the query: {query.query}"}],
             max_tokens=50
         )
 
         # Extract suggestions from OpenAI response
-        suggestions = response['choices'][0]['text'].strip().split("\n")
+        suggestions = response['choices'][0]['message']['content'].strip().split("\n")
         return {"query": query.query, "suggestions": suggestions}
     
     except Exception as e:
         return {"error": str(e)}
 
-# A simple root endpoint to check if FastAPI is running
+# Root endpoint for checking FastAPI
 @app.get("/")
 async def root():
     return {"message": "Hello, FastAPI!"}
