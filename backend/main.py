@@ -4,6 +4,9 @@ import openai
 import os
 from fastapi.middleware.cors import CORSMiddleware
 
+# Set OpenAI API key from environment variables
+openai.api_key = os.getenv('OPENAI_API_KEY')
+
 app = FastAPI()
 
 app.add_middleware(
@@ -22,18 +25,19 @@ class RestaurantQuery(BaseModel):
 @app.post("/suggest_restaurant")
 async def suggest_restaurant(query: RestaurantQuery):
     try:
-        # Ensure the API key is set from environment variables
-        openai.api_key = os.getenv('OPENAI_API_KEY')
-
         # Call OpenAI API to get restaurant suggestions using the ChatCompletion endpoint
-        response = openai.chat.completions.create(
+        response = openai.chat.completion.create(
             model="gpt-3.5-turbo",  # or gpt-4 if available
             messages=[{"role": "user", "content": f"Suggest some restaurants based on the query: {query.query}"}],
             max_tokens=50
         )
 
-        # Extract suggestions from OpenAI response
-        suggestions = [msg['content'] for msg in response['choices'][0]['message']]
+        # Extract the assistant's message from the response
+        suggestions_text = response['choices'][0]['message']['content']
+
+        # You can split the suggestions by commas or new lines if needed, depending on how they are returned
+        suggestions = suggestions_text.strip().split(',')  # Adjust this depending on the format
+
         return {"query": query.query, "suggestions": suggestions}
     
     except Exception as e:

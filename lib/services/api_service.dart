@@ -1,4 +1,3 @@
-// api_service.dart
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -22,7 +21,14 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return List<String>.from(data['suggestions']);
+
+        // Check if the suggestions exist and are not null
+        if (data != null && data['suggestions'] != null) {
+          return List<String>.from(data['suggestions']);
+        } else {
+          print('No suggestions found in the response.');
+          return ["No suggestions found"];
+        }
       } else {
         print('Error: Received ${response.statusCode} status code from the API.');
         throw Exception('Failed to load suggestions');
