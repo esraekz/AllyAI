@@ -5,8 +5,6 @@ import os
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 
-# Load environment variables from .env file
-load_dotenv()
 
 # Set OpenAI API key from environment variables
 openai.api_key = os.getenv('OPENAI_API_KEY')
