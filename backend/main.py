@@ -26,7 +26,7 @@ class RestaurantQuery(BaseModel):
 async def suggest_restaurant(query: RestaurantQuery):
     try:
         # Call OpenAI API to get restaurant suggestions using the ChatCompletion endpoint
-        response = openai.chat.completion.create(
+        response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",  # or gpt-4 if available
             messages=[{"role": "user", "content": f"Suggest some restaurants based on the query: {query.query}"}],
             max_tokens=50
