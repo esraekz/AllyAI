@@ -21,23 +21,19 @@ app.add_middleware(
 class RestaurantQuery(BaseModel):
     query: str
 
-# Create an endpoint to suggest restaurants using OpenAI's ChatCompletion API
+# Create an endpoint to suggest restaurants using OpenAI's new completions API
 @app.post("/suggest_restaurant")
 async def suggest_restaurant(query: RestaurantQuery):
     try:
-        # Call OpenAI API to get restaurant suggestions using the ChatCompletion endpoint
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",  # or gpt-4 if available
-            messages=[{"role": "user", "content": f"Suggest some restaurants based on the query: {query.query}"}],
+        # Use the correct API call for OpenAI>=1.0.0
+        response = openai.completions.create(
+            model="gpt-3.5-turbo",  # You can use "gpt-4" if available
+            prompt=f"Suggest some restaurants based on the query: {query.query}",
             max_tokens=50
         )
 
-        # Extract the assistant's message from the response
-        suggestions_text = response['choices'][0]['message']['content']
-
-        # You can split the suggestions by commas or new lines if needed, depending on how they are returned
-        suggestions = suggestions_text.strip().split(',')  # Adjust this depending on the format
-
+        # Extract suggestions from OpenAI response
+        suggestions = response['choices'][0]['text'].strip().split("\n")
         return {"query": query.query, "suggestions": suggestions}
     
     except Exception as e:
