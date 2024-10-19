@@ -1,16 +1,14 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 import os
+import openai  # Ensure OpenAI is imported
 from fastapi.middleware.cors import CORSMiddleware
-from langchain import PromptTemplate, LLMChain
-from langchain.llms import OpenAI
-from dotenv import load_dotenv
+from langchain.chains import LLMChain
+from langchain import PromptTemplate
+from langchain.llms import OpenAI as LangchainOpenAI  # Import Langchain OpenAI wrapper
 
-#load_dotenv()  # Ensure environment variables from .env file are loaded
 # Set OpenAI API key from environment variables (handled by Render or other deployment environment)
 openai.api_key = os.getenv('OPENAI_API_KEY')
-
-print(f"OpenAI API Key: {os.getenv('OPENAI_API_KEY')}")
 
 app = FastAPI()
 
@@ -37,7 +35,7 @@ async def suggest_restaurant(query: RestaurantQuery):
         )
         
         # Use Langchain's OpenAI LLM wrapper
-        llm = OpenAI(model_name="gpt-3.5-turbo")  # Use "gpt-4" if available
+        llm = LangchainOpenAI(model_name="gpt-3.5-turbo")  # Use "gpt-4" if available
         
         # Create an LLMChain to link the prompt template and the language model
         chain = LLMChain(prompt=prompt_template, llm=llm)
